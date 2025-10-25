@@ -29,31 +29,24 @@ jobs:
       run: |
         mkdir -p build
         
-        # Package questions
-        if [ -d "assets/questions" ] && [ "$(ls -A assets/questions)" ]; then
-          cd assets/questions
-          zip -r ../../build/enem_questions_v1.zip .
-          cd ../..
-        fi
-        
         # Package models
         if [ -d "assets/models" ] && [ "$(ls -A assets/models)" ]; then
           cd assets/models
-          zip -r ../../build/gemma_model_v1.zip .
+          zip -r ../../build/ai_models_v1.zip .
           cd ../..
         fi
         
         # Package images
         if [ -d "assets/images" ] && [ "$(ls -A assets/images)" ]; then
           cd assets/images
-          zip -r ../../build/question_images_v1.zip .
+          zip -r ../../build/app_images_v1.zip .
           cd ../..
         fi
         
-        # Package resources
-        if [ -d "assets/resources" ] && [ "$(ls -A assets/resources)" ]; then
-          cd assets/resources
-          zip -r ../../build/study_materials_v1.zip .
+        # Package animations
+        if [ -d "assets/animations" ] && [ "$(ls -A assets/animations)" ]; then
+          cd assets/animations
+          zip -r ../../build/lottie_animations_v1.zip .
           cd ../..
         fi
         
@@ -64,10 +57,10 @@ jobs:
           cd ../..
         fi
         
-        # Package translations
-        if [ -d "assets/translations" ] && [ "$(ls -A assets/translations)" ]; then
-          cd assets/translations
-          zip -r ../../build/translations_v1.zip .
+        # Package data
+        if [ -d "assets/data" ] && [ "$(ls -A assets/data)" ]; then
+          cd assets/data
+          zip -r ../../build/app_data_v1.zip .
           cd ../..
         fi
     
