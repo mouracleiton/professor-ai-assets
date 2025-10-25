@@ -1,0 +1,106 @@
+name: Build and Release Assets
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'assets/**'
+      - '.github/workflows/build-and-release.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyyaml
+    
+    - name: Create asset packages
+      run: |
+        mkdir -p build
+        
+        # Package questions
+        if [ -d "assets/questions" ] && [ "$(ls -A assets/questions)" ]; then
+          cd assets/questions
+          zip -r ../../build/enem_questions_v1.zip .
+          cd ../..
+        fi
+        
+        # Package models
+        if [ -d "assets/models" ] && [ "$(ls -A assets/models)" ]; then
+          cd assets/models
+          zip -r ../../build/gemma_model_v1.zip .
+          cd ../..
+        fi
+        
+        # Package images
+        if [ -d "assets/images" ] && [ "$(ls -A assets/images)" ]; then
+          cd assets/images
+          zip -r ../../build/question_images_v1.zip .
+          cd ../..
+        fi
+        
+        # Package resources
+        if [ -d "assets/resources" ] && [ "$(ls -A assets/resources)" ]; then
+          cd assets/resources
+          zip -r ../../build/study_materials_v1.zip .
+          cd ../..
+        fi
+        
+        # Package fonts
+        if [ -d "assets/fonts" ] && [ "$(ls -A assets/fonts)" ]; then
+          cd assets/fonts
+          zip -r ../../build/custom_fonts_v1.zip .
+          cd ../..
+        fi
+        
+        # Package translations
+        if [ -d "assets/translations" ] && [ "$(ls -A assets/translations)" ]; then
+          cd assets/translations
+          zip -r ../../build/translations_v1.zip .
+          cd ../..
+        fi
+    
+    - name: Generate checksums
+      run: |
+        cd build
+        sha256sum * > checksums.sha256
+        cat checksums.sha256
+    
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Assets Release v${{ github.run_number }}
+        body: |
+          Automated asset release
+          
+          All assets have been packaged and are ready for download.
+          
+          **Verification**
+          Verify downloaded files with:
+          ```bash
+          sha256sum -c checksums.sha256
+          ```
+        draft: false
+        prerelease: false
+    
+    - name: Upload assets to release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: build/*
+        tag_name: v${{ github.run_number }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
