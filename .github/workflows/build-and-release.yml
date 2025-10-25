@@ -77,17 +77,14 @@ jobs:
         sha256sum * > checksums.sha256
         cat checksums.sha256
     
-    - name: Create Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload assets to release
+      uses: softprops/action-gh-release@v2
       with:
-        tag_name: v${{ github.run_number }}
-        release_name: Assets Release v${{ github.run_number }}
+        files: build/*
+        tag_name: latest
+        name: Latest Assets Release
         body: |
-          Automated asset release
-          
-          All assets have been packaged and are ready for download.
+          Automated asset release with all packaged assets.
           
           **Verification**
           Verify downloaded files with:
@@ -96,11 +93,5 @@ jobs:
           ```
         draft: false
         prerelease: false
-    
-    - name: Upload assets to release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: build/*
-        tag_name: v${{ github.run_number }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
